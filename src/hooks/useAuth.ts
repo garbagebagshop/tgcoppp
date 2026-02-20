@@ -40,11 +40,13 @@ export function useAuth() {
     mobile: string,
     email: string
   ): Promise<{ success: boolean; error?: string }> => {
+    const normalizedMobile = mobile.replace(/\D/g, '');
+
     // Dev shortcut — instant pro access for testing
     if (email.includes('@pro') || email.includes('+pro')) {
       const devUser: AuthUser = {
         id: 'dev',
-        mobile,
+        mobile: normalizedMobile,
         email,
         name: 'Dev User',
         isPaid: true,
@@ -60,7 +62,7 @@ export function useAuth() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile: mobile.trim(), email: email.trim() }),
+        body: JSON.stringify({ mobile: normalizedMobile, email: email.trim() }),
       });
 
       const data = await res.json();
@@ -79,7 +81,7 @@ export function useAuth() {
         const localUsers = JSON.parse(localStorage.getItem('tgcop_users') || '[]');
         const found = localUsers.find(
           (u: { mobile: string; email: string; plan_start: number; plan_months: number; id: string; name: string }) =>
-            u.mobile === mobile.trim() &&
+            u.mobile === normalizedMobile &&
             u.email.toLowerCase() === email.trim().toLowerCase()
         );
         if (found) {
