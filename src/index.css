@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --police-950: #0a1628;
+    --police-900: #1e3a5f;
+    --police-800: #1e4976;
+    --police-700: #1a5fa8;
+    --police-600: #1d6fc4;
+    --police-500: #2589e8;
+    --police-400: #5ba8f5;
+    --police-300: #93c5fd;
+    --police-100: #dbeafe;
+    --police-50:  #eff6ff;
+    --accent-gold: #f59e0b;
+    --accent-saffron: #ea580c;
+    --success: #16a34a;
+    --danger: #dc2626;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #f0f4f8;
+    color: #1a202c;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Safe area for notched phones */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  h1, h2, h3 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  /* === CARD === */
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100;
+  }
+
+  /* === BUTTONS === */
+  .btn-primary {
+    @apply bg-[#1e3a5f] text-white font-semibold px-5 py-2.5 rounded-xl
+           hover:bg-[#1e4976] active:scale-[0.97] transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-[#2589e8] focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-[#1e3a5f] font-semibold px-5 py-2.5 rounded-xl border border-[#1e3a5f]
+           hover:bg-[#eff6ff] active:scale-[0.97] transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-[#2589e8] focus:ring-offset-2;
+  }
+
+  .btn-gold {
+    @apply bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold
+           px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-600
+           active:scale-[0.97] transition-all duration-150 shadow-md
+           focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2;
+  }
+
+  /* === SUBJECT PILL === */
+  .subject-pill {
+    @apply whitespace-nowrap px-3.5 py-1.5 rounded-full text-sm font-medium
+           transition-all duration-150 cursor-pointer select-none;
+  }
+
+  .subject-pill-active {
+    @apply bg-[#1e3a5f] text-white shadow-sm;
+  }
+
+  .subject-pill-inactive {
+    @apply bg-white text-gray-600 border border-gray-200 hover:border-[#1e3a5f] hover:text-[#1e3a5f];
+  }
+
+  /* === OPTION BUTTON === */
+  .option-btn {
+    @apply w-full p-3.5 text-left border-2 rounded-xl transition-all duration-150
+           font-medium text-sm leading-snug;
+  }
+
+  .option-default {
+    @apply border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 text-gray-800;
+  }
+
+  .option-selected {
+    @apply border-[#2589e8] bg-blue-50 text-[#1e3a5f];
+  }
+
+  .option-correct {
+    @apply border-green-500 bg-green-50 text-green-800;
+  }
+
+  .option-wrong {
+    @apply border-red-400 bg-red-50 text-red-800;
+  }
+
+  .option-missed {
+    @apply border-gray-200 bg-gray-50 text-gray-500;
+  }
+
+  /* === BADGE === */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  .badge-blue   { @apply bg-blue-100 text-blue-800; }
+  .badge-green  { @apply bg-green-100 text-green-800; }
+  .badge-red    { @apply bg-red-100 text-red-800; }
+  .badge-yellow { @apply bg-yellow-100 text-yellow-800; }
+  .badge-gray   { @apply bg-gray-100 text-gray-700; }
+  .badge-gold   { @apply bg-amber-100 text-amber-800; }
+
+  /* === GK CARD ACCENTS === */
+  .gk-card-telangana  { @apply border-l-4 border-[#1e3a5f]; }
+  .gk-card-india      { @apply border-l-4 border-orange-500; }
+  .gk-card-govt       { @apply border-l-4 border-green-500; }
+  .gk-card-police     { @apply border-l-4 border-purple-500; }
+  .gk-card-awards     { @apply border-l-4 border-amber-500; }
+
+  /* === NOTIFICATION CARDS === */
+  .notif-exam    { @apply border-l-4 border-blue-500; }
+  .notif-result  { @apply border-l-4 border-green-500; }
+  .notif-urgent  { @apply border-l-4 border-red-500; }
+  .notif-general { @apply border-l-4 border-gray-400; }
+
+  /* === PROGRESS BAR === */
+  .progress-bar-track {
+    @apply w-full bg-gray-100 rounded-full h-2 overflow-hidden;
+  }
+  .progress-bar-fill {
+    @apply h-2 bg-[#2589e8] rounded-full transition-all duration-300;
+  }
+
+  /* === BLUR CTA (for locked content) === */
+  .content-blur {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* === UPGRADE BANNER === */
+  .upgrade-banner {
+    @apply bg-gradient-to-r from-[#1e3a5f] to-[#1a5fa8] text-white;
+  }
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+
+  /* Safe-area bottom padding for mobile */
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* Mobile nav height (for content spacing) */
+  .mb-nav {
+    margin-bottom: 5rem;
+  }
+}
+
+/* Smooth scroll for mobile */
+@media (max-width: 640px) {
+  .scroll-x-smooth {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .scroll-x-smooth::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.3s ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}

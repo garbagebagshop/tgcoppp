@@ -1,0 +1,23 @@
+{
+  "name": "TGCOP – Telangana Police Exam Prep",
+  "short_name": "TGCOP",
+  "description": "Daily exam-readiness platform for Telangana Police TGLPRB aspirants.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e3a5f",
+  "theme_color": "#1e3a5f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/tgcop-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "education",
+    "utilities"
+  ],
+  "lang": "en-IN"
+}
