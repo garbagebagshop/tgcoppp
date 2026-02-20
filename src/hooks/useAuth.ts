@@ -1,60 +1,52 @@
 import { useState, useEffect } from 'react';
 
-const AUTH_KEY = 'tgcop_auth';
-const USERS_KEY = 'tgcop_users';
-
 export interface AuthUser {
   id: string;
   mobile: string;
   email: string;
   name: string;
   isPaid: boolean;
-  planExpiry: number; // unix ms
+  planExpiry: number;
 }
 
-interface StoredUser {
-  id: string;
-  mobile: string;
-  email: string;
-  name: string;
-  planStart: number;
-  planMonths: number;
-  notes: string;
-}
+const AUTH_KEY = 'tgcop_auth';
 
-function getPlanExpiry(u: StoredUser): number {
-  return u.planStart + u.planMonths * 30 * 24 * 60 * 60 * 1000;
-}
-
-function getStoredUsers(): StoredUser[] {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }
-  catch { return []; }
+function getStoredUser(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem(AUTH_KEY);
+    if (!raw) return null;
+    const u = JSON.parse(raw) as AuthUser;
+    // Re-validate expiry on every load
+    if (u.isPaid && u.planExpiry < Date.now()) {
+      u.isPaid = false;
+      localStorage.setItem(AUTH_KEY, JSON.stringify(u));
+    }
+    return u;
+  } catch {
+    return null;
+  }
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(getStoredUser);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(AUTH_KEY);
-      if (saved) setUser(JSON.parse(saved));
-    } catch { /* ignore */ }
-    setLoading(false);
+    const stored = getStoredUser();
+    setUser(stored);
   }, []);
 
-  /**
-   * Login with mobile (ID) + email (password).
-   * Also supports dev shortcut: any @pro email gets instant paid access.
-   */
-  const login = (mobile: string, emailOrPassword: string): { success: boolean; error?: string } => {
-    // Dev shortcut: @pro in email = instant paid access
-    if (emailOrPassword.includes('@pro') || emailOrPassword.includes('+pro')) {
+  const login = async (
+    mobile: string,
+    email: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    // Dev shortcut — instant pro access for testing
+    if (email.includes('@pro') || email.includes('+pro')) {
       const devUser: AuthUser = {
-        id: 'dev_pro',
-        mobile: mobile || '9999999999',
-        email: emailOrPassword,
-        name: 'Pro Demo User',
+        id: 'dev',
+        mobile,
+        email,
+        name: 'Dev User',
         isPaid: true,
         planExpiry: Date.now() + 365 * 24 * 60 * 60 * 1000,
       };
@@ -63,30 +55,52 @@ export function useAuth() {
       return { success: true };
     }
 
-    // Standard: look up mobile in admin-created users
-    const users = getStoredUsers();
-    const found = users.find(
-      u => u.mobile === mobile.trim() && u.email.toLowerCase() === emailOrPassword.trim().toLowerCase()
-    );
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: mobile.trim(), email: email.trim() }),
+      });
 
-    if (!found) {
-      return { success: false, error: 'Invalid mobile or email. Check your credentials.' };
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Login failed. Check your credentials.' };
+      }
+
+      const authUser: AuthUser = data.user;
+      localStorage.setItem(AUTH_KEY, JSON.stringify(authUser));
+      setUser(authUser);
+      return { success: true };
+    } catch {
+      // Fallback to localStorage if API unreachable (offline / local dev without API)
+      try {
+        const localUsers = JSON.parse(localStorage.getItem('tgcop_users') || '[]');
+        const found = localUsers.find(
+          (u: { mobile: string; email: string; plan_start: number; plan_months: number; id: string; name: string }) =>
+            u.mobile === mobile.trim() &&
+            u.email.toLowerCase() === email.trim().toLowerCase()
+        );
+        if (found) {
+          const expiry = found.plan_start + found.plan_months * 30 * 24 * 60 * 60 * 1000;
+          const authUser: AuthUser = {
+            id: found.id,
+            mobile: found.mobile,
+            email: found.email,
+            name: found.name,
+            isPaid: expiry > Date.now(),
+            planExpiry: expiry,
+          };
+          localStorage.setItem(AUTH_KEY, JSON.stringify(authUser));
+          setUser(authUser);
+          return { success: true };
+        }
+      } catch { /* ignore */ }
+      return { success: false, error: 'Network error. Please check your connection.' };
+    } finally {
+      setLoading(false);
     }
-
-    const expiry = getPlanExpiry(found);
-    const isPaid = expiry > Date.now();
-
-    const authUser: AuthUser = {
-      id: found.id,
-      mobile: found.mobile,
-      email: found.email,
-      name: found.name,
-      isPaid,
-      planExpiry: expiry,
-    };
-    localStorage.setItem(AUTH_KEY, JSON.stringify(authUser));
-    setUser(authUser);
-    return { success: true };
   };
 
   const logout = () => {
@@ -94,10 +108,5 @@ export function useAuth() {
     setUser(null);
   };
 
-  const isSubscriptionActive = (): boolean => {
-    if (!user) return false;
-    return user.isPaid && user.planExpiry > Date.now();
-  };
-
-  return { user, loading, login, logout, isSubscriptionActive };
+  return { user, login, logout, loading };
 }

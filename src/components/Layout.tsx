@@ -17,8 +17,8 @@ const tabs = [
 ];
 
 export function Layout({ children, activeTab, onTabChange, onAdminClick }: LayoutProps) {
-  const { user, logout, isSubscriptionActive } = useAuth();
-  const isPaid = isSubscriptionActive();
+  const { user, logout } = useAuth();
+  const isPaid = user?.isPaid ?? false;
 
   return (
     <div className="min-h-screen bg-[#f0f4f8] flex flex-col">
@@ -146,13 +146,14 @@ export function Layout({ children, activeTab, onTabChange, onAdminClick }: Layou
             Independent platform. Not affiliated with TGLPRB or Telangana Police.
           </div>
         </div>
-        {/* Hidden admin trigger — invisible, click to access admin console */}
-        <div className="text-center pb-2">
-          <span
+        {/* Admin link — visible but subtle */}
+        <div className="text-center pb-3">
+          <button
             onClick={onAdminClick}
-            title=""
-            style={{ color: 'transparent', fontSize: '10px', userSelect: 'none', cursor: 'default' }}
-          >TGCOP</span>
+            style={{ background: 'none', border: 'none', color: '#4a6fa5', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline', opacity: 0.7 }}
+          >
+            Admin ↗
+          </button>
         </div>
       </footer>
     </div>
