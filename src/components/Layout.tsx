@@ -1,12 +1,12 @@
 import React from 'react';
 import { Shield, BookOpen, Target, Newspaper, Bell, LogOut, Star, Crown } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
   activeTab: string;
   onTabChange: (tab: string) => void;
-  onAdminClick: () => void;
 }
 
 const tabs = [
@@ -16,9 +16,17 @@ const tabs = [
   { id: 'notifications', label: 'Notifications', shortLabel: 'Alerts', icon: Bell },
 ];
 
-export function Layout({ children, activeTab, onTabChange, onAdminClick }: LayoutProps) {
+export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
   const { user, logout } = useAuth();
   const isPaid = user?.isPaid ?? false;
+  const navigate = useNavigate();
+
+  const handleAdminTrigger = () => {
+    const enteredPassword = window.prompt('Enter admin password');
+    if (enteredPassword === 'TGCOP_ADMIN_123') {
+      navigate('/admin');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f0f4f8] flex flex-col">
@@ -140,20 +148,17 @@ export function Layout({ children, activeTab, onTabChange, onAdminClick }: Layou
       <footer className="hidden md:block bg-[#1e3a5f] text-white mt-auto">
         <div className="max-w-4xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
           <div className="text-blue-200">
-            <strong className="text-white">TGCOP</strong> – Keeping Telangana Police aspirants exam-ready every day.
+            <strong
+              className="text-white cursor-pointer opacity-90"
+              onClick={handleAdminTrigger}
+            >
+              TGCOP
+            </strong>{' '}
+            – Keeping Telangana Police aspirants exam-ready every day.
           </div>
           <div className="text-blue-300 text-xs text-center">
             Independent platform. Not affiliated with TGLPRB or Telangana Police.
           </div>
-        </div>
-        {/* Admin link — visible but subtle */}
-        <div className="text-center pb-3">
-          <button
-            onClick={onAdminClick}
-            style={{ background: 'none', border: 'none', color: '#4a6fa5', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline', opacity: 0.7 }}
-          >
-            Admin ↗
-          </button>
         </div>
       </footer>
     </div>
