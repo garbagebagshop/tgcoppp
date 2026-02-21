@@ -7,6 +7,7 @@ const SEATS_TAKEN = 27;
 
 interface HomePageProps {
     onLoginClick: () => void;
+    onAdminTrigger: () => void;
 }
 
 const testimonials = [
@@ -34,7 +35,7 @@ const faqs = [
     { q: 'What if I do not get access in 12 hours?', a: 'WhatsApp us again — we are available 8 AM to 10 PM every day including Sundays. Refunds are processed if access is not given within 24 hours.' },
 ];
 
-export function HomePage({ onLoginClick }: HomePageProps) {
+export function HomePage({ onLoginClick, onAdminTrigger }: HomePageProps) {
     const [seatsLeft, setSeatsLeft] = useState(TOTAL_SEATS - SEATS_TAKEN);
     const [countdown, setCountdown] = useState({ h: 5, m: 42, s: 17 });
     const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -512,7 +513,7 @@ export function HomePage({ onLoginClick }: HomePageProps) {
             {/* Footer */}
             <footer style={{ background: '#1a1a2e', color: '#9ca3af', padding: '24px 20px', textAlign: 'center', fontSize: '13px' }}>
                 <div style={{ marginBottom: '8px' }}>
-                    © 2024 TGCOP — Telangana Competitive Online Preparation
+                    © 2024 <span onClick={onAdminTrigger} style={{ cursor: 'pointer', opacity: 0.85 }}>TGCOP</span> — Telangana Competitive Online Preparation
                 </div>
                 <div style={{ fontSize: '11px', opacity: 0.6, marginBottom: '12px' }}>
                     Not affiliated with TSLPRB or Government of Telangana. For educational purposes only.

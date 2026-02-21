@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { Layout } from './components/Layout';
 import { DailyQNA } from './components/DailyQNA';
@@ -10,12 +11,20 @@ import { UpgradePage } from './components/UpgradePage';
 import { HomePage } from './components/HomePage';
 import { AdminPage } from './components/AdminPage';
 
-export type Tab = 'qna' | 'test' | 'gk' | 'notifications' | 'upgrade' | 'admin';
+export type Tab = 'qna' | 'test' | 'gk' | 'notifications' | 'upgrade';
 
-export default function App() {
+function MainApp() {
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('qna');
   const [showAuth, setShowAuth] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAdminTrigger = () => {
+    const enteredPassword = window.prompt('Enter admin password');
+    if (enteredPassword === 'TGCOP_ADMIN_123') {
+      navigate('/admin');
+    }
+  };
 
   if (loading) {
     return (
@@ -31,56 +40,34 @@ export default function App() {
     );
   }
 
-  // Admin page — standalone, no Layout wrapper
-  if (activeTab === 'admin') {
-    return (
-      <>
-        <AdminPage />
-        <div style={{ textAlign: 'center', padding: '12px', background: '#0f172a' }}>
-          <button onClick={() => setActiveTab('qna')} style={{
-            background: 'none', border: 'none', color: '#475569',
-            fontSize: '12px', cursor: 'pointer'
-          }}>← Back to App</button>
-        </div>
-      </>
-    );
-  }
-
-  // Not logged in → show home page
   if (!user) {
     return (
       <>
-        <HomePage onLoginClick={() => setShowAuth(true)} />
+        <HomePage onLoginClick={() => setShowAuth(true)} onAdminTrigger={handleAdminTrigger} />
         {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
-        {/* Hidden admin trigger */}
-        <div
-          onClick={() => setActiveTab('admin')}
-          style={{
-            position: 'fixed', bottom: 8, right: 12,
-            fontSize: '10px', color: 'transparent',
-            userSelect: 'none', cursor: 'default', zIndex: 9999
-          }}
-        >
-          TGCOP
-        </div>
       </>
     );
   }
 
-  // Logged in → show main app
   return (
-    <>
-      <Layout
-        activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab as Tab)}
-        onAdminClick={() => setActiveTab('admin')}
-      >
-        {activeTab === 'qna' && <DailyQNA />}
-        {activeTab === 'test' && <DailyTest />}
-        {activeTab === 'gk' && <DailyGK />}
-        {activeTab === 'notifications' && <Notifications />}
-        {activeTab === 'upgrade' && <UpgradePage />}
-      </Layout>
-    </>
+    <Layout
+      activeTab={activeTab}
+      onTabChange={(tab) => setActiveTab(tab as Tab)}
+    >
+      {activeTab === 'qna' && <DailyQNA />}
+      {activeTab === 'test' && <DailyTest />}
+      {activeTab === 'gk' && <DailyGK />}
+      {activeTab === 'notifications' && <Notifications />}
+      {activeTab === 'upgrade' && <UpgradePage />}
+    </Layout>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainApp />} />
+      <Route path="/admin" element={<AdminPage />} />
+    </Routes>
   );
 }

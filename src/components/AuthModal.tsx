@@ -18,9 +18,12 @@ export function AuthModal({ onClose }: AuthModalProps) {
     setError('');
     if (!mobile.trim()) { setError('Enter your mobile number.'); return; }
     if (!email.trim()) { setError('Enter your email address.'); return; }
+    const normalizedMobile = mobile.replace(/\D/g, '');
+    if (!normalizedMobile.match(/^[6-9]\d{9}$/)) { setError('Enter a valid 10-digit mobile number.'); return; }
+
     setLoading(true);
     await new Promise(r => setTimeout(r, 400));
-    const result = login(mobile.trim(), email.trim());
+    const result = await login(normalizedMobile, email.trim());
     setLoading(false);
     if (result.success) {
       onClose();
